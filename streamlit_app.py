@@ -4,6 +4,7 @@ import requests
 from random import random
 import os.path
 import base64
+import datetime
 
 # build country dicts
 from country_list import countries
@@ -31,19 +32,16 @@ def execfile(filename, key, globals=None, locals=None):
         locals = sys._getframe(1).f_locals
     #st.write("...here 2..")
     if True: #os.path.exists(filename+'.pye'):
-        #st.write("exec pye")
         with open(filename+'.pye', "r") as fh:
             # read the encrypted version if it exists
             base64_code = vigenere.translate(fh.read()+"\n",key,1)
             code = base64.b64decode(base64_code.encode('utf-8')).decode('utf-8') 
             #st.write(code)
     else:
-        #st.write("exec py")
         with open(filename+'.py', "r") as fh:
             code = fh.read()+"\n"
             # write the encrypted version if it doesn't exist
             with open(filename+'.pye', "w") as fhw:
-                 #st.write("write pye")
                  base64_code = base64.b64encode(code.encode('utf-8')).decode('utf-8')
                  fhw.write(vigenere.translate(base64_code,key,0))
     #st.write('code ```'+code+"```")
@@ -66,6 +64,18 @@ def update_cache_state():
     if 'result' in st.session_state:
         del st.session_state['result']
 
+def log_data(context,data):
+    with open("logs.txt","a") as fh:
+        fh.write('-----\n\n## %s\n\n'%datetime.date.today().strftime('%Y-%m-%d-%H:%M:%S'))
+        fh.write("```\n\n"+context+"\n\n```\n\n")
+        fh.write('\n\n### Response\n\n')
+        fh.write("```\n\n"+data+"\n\n```\n\n")
+        
+def show_logs():
+    with open("logs.txt","r") as fh:
+        st.write("# Logs\n\n")
+        st.write(fh.read())
+        
 #####################################
 global get_news_feed,generate_ai_response
 
@@ -78,8 +88,15 @@ def main():
         page_title="AI Diplomatic Analysis Tool (Adat)",  # String or None. Strings get appended with "• Streamlit".
         page_icon=None,  # String, anything supported by st.image, or None.
     )
+
+    query_params = st.experimental_get_query_params()
+    if 'logs' in query_params:
+        show_logs()
+        return
+    
     st.title("AI Tool for Examination of Diplomatic Senarios (AI-TEDS)")
-    """This app enables analaysis and examination of related diplomatic senarios!"""
+    """This is a Beta Test of tool withich enables analaysis and examination of related diplomatic senarios. It can generate implications on a per country basis, propose (and cost projects) and generate tweets."""
+
 
     with st.expander("Options..."):
         length = 512
@@ -145,6 +162,10 @@ def main():
                 #st.write(inp)
         
                 result="1. "+generate_ai_response(alg_input,length,temp,st.session_state['update_cache_state'])
+
+                # log the data
+                result = result.split('===')[0]
+                log_data(alg_input.split('===')[-1],result)
                 
                 st.session_state.peice = []
                 for r in result.split('\n')[0:10]:
