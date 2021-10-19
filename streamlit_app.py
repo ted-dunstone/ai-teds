@@ -64,13 +64,30 @@ def update_cache_state():
     if 'result' in st.session_state:
         del st.session_state['result']
 
-def log_data(context,data):
-    with open("logs.txt","a") as fh:
-        fh.write('-----\n\n## %s\n\n'%datetime.date.today().strftime('%Y-%m-%d-%H:%M:%S'))
+def log_data(context,data=None):
+    with open("logs.txt","r") as fh:
+        logstxt = fh.read()
+    with open("logs.txt","w") as fh:
+        fh.write('-----\n\n## %s\n\n'%datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S'))
         fh.write("```\n\n"+context+"\n\n```\n\n")
-        fh.write('\n\n### Response\n\n')
-        fh.write("```\n\n"+data+"\n\n```\n\n")
-        
+        if data is not None:
+            fh.write('\n\n### Response\n\n')
+            fh.write("```\n\n"+data+"\n\n```\n\n")
+        fh.write(logstxt)
+    with open("audit.txt","a") as fh:
+        fh.write('-----\n\n## %s\n\n'%datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S'))
+        fh.write("```\n\n"+context+"\n\n```\n\n")
+        if data is not None:
+            fh.write('\n\n### Response\n\n')
+            fh.write("```\n\n"+data+"\n\n```\n\n")
+
+
+def on_click_bad():
+    log_data("Bad")
+
+def on_click_good():
+    log_data("Good")
+
 def show_logs():
     with open("logs.txt","r") as fh:
         st.write("# Logs\n\n")
@@ -84,7 +101,7 @@ global conditioning
 def main():
     st.set_page_config(  # Alternate names: setup_page, page, layout
         layout="wide",  # Can be "centered" or "wide". In the future also "dashboard", etc.
-        initial_sidebar_state="auto",  # Can be "auto", "expanded", "collapsed"
+        initial_sidebar_state="expanded",  # Can be "auto", "expanded", "collapsed"
         page_title="AI Diplomatic Analysis Tool (Adat)",  # String or None. Strings get appended with "• Streamlit".
         page_icon=None,  # String, anything supported by st.image, or None.
     )
@@ -97,15 +114,13 @@ def main():
     st.title("AI Tool for Examination of Diplomatic Senarios (AI-TEDS)")
     """This is a Beta Test of tool withich enables analaysis and examination of related diplomatic senarios. It can generate implications on a per country basis, propose (and cost projects) and generate tweets."""
 
-
-    with st.expander("Options..."):
-        length = 512
+    st.sidebar.text_input("Usage Key",key="usage_key", help="Please enter the TEDS keys. Contact ted@biometix.com if you need one.")
+            
+    #with st.expander("Options..."):
+    length = 512
         #if 'key' not in st.session_state:
             #st.session_state.key=''
-        st.text_input("Usage Key",key="usage_key")
-        temp = st.selectbox('creativity',[0.5,0.8,1.0,1.1],2,format_func=lambda val : {0.5:'Low',0.8:'Medium',1.0:'Normal',1.1:'High'}[val])
-        st.write(temp)
-
+        
     if st.session_state.usage_key=='':
         return
 
@@ -117,23 +132,27 @@ def main():
         st.error("Invalid key: contact ted@biometix.com for a usage key.")
         return
 
+    temp = st.sidebar.selectbox('creativity',[0.5,0.8,1.0,1.1],2,format_func=lambda val : {0.5:'Low',0.8:'Medium',1.0:'Normal',1.1:'High'}[val],help="This will set how creative you would like the reponses.")
+    
     st.info('This is a Beta Service. It has usage limitations which restrict its use to a maxium of 20 queries an hour (accross all users). Please test wisely.')
-    with st.expander("Context.."):
-        cols = st.columns(6)
-        countries = cols[0].multiselect("Choose countries", list(country_dict.keys()))
-        cols[3].button('Clear', on_click=clear_session, help='clear the results to regenerate')
-        articles={}
-        news_urls = []
-        
-        for country in countries:
-            if 'news' in country_dict[country]:
-                news_urls.extend(country_dict[country]['news'])
-        cols[2].markdown('# ' + ' '.join([":flag-"+country_dict[country]['code']+': ' for country in countries]).lower())
-        if len(news_urls)==0:
-            news_urls = ['http://feeds.bbci.co.uk/news/world/rss.xml']
-        for url in news_urls:
-            articles = {**articles, **get_news_feed(url)}
-        res=st.selectbox('articles',['None']+sorted(list(articles.keys())),on_change=clear_session)
+    #with st.sidebar.expander("Context..") as exp:
+        #cols = st.sidebar.columns(2)
+    countries = st.sidebar.multiselect("Choose countries", list(country_dict.keys()),['Singapore','Australia'])
+    st.sidebar.button('Clear', on_click=clear_session, help='clear the results to regenerate')
+    articles={}
+    news_urls = []
+    
+    for country in countries:
+        if 'news' in country_dict[country]:
+            news_urls.extend(country_dict[country]['news'])
+    
+    st.sidebar.markdown('# ' + ' '.join([":flag-"+country_dict[country]['code']+': ' for country in countries]).lower())
+    
+    if len(news_urls)==0:
+        news_urls = ['https://www.foreignpolicy.com/feed/','https://www.fpri.org/feed','https://www.medium.com/feed/tag/foreign-policy','https://www.theconversation.com/au/topics/foreign-policy-266/articles.atom','http://feeds.bbci.co.uk/news/world/rss.xml']
+    for url in news_urls:
+        articles = {**articles, **get_news_feed(url)}
+    res=st.sidebar.selectbox('articles',['None']+sorted(list(articles.keys())),on_change=clear_session)
             
     conditioning_type=st.selectbox('type',list(conditioning.keys()),on_change=clear_session)
 
@@ -221,16 +240,8 @@ def main():
     if True:
         col1, col2, *rest = st.columns([1, 1, 10, 10])
 
-        def on_click_good():
-            response["rate"] = "good"
-            print(response)
-
-        def on_click_bad():
-            response["rate"] = "bad"
-            print(response)
-
-        col1.button("👍")#, on_click=on_click_good)
-        col2.button("👎")#, on_click=on_click_bad)
+        col1.button("👍", on_click=on_click_good)
+        col2.button("👎", on_click=on_click_bad)
 
     
     #st.text("App baked with ❤️ by @vicgalle")
