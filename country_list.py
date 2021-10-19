@@ -8,7 +8,7 @@ countries = [
 {'timezones': ['America/Argentina/Buenos_Aires', 'America/Argentina/Cordoba', 'America/Argentina/Jujuy', 'America/Argentina/Tucuman', 'America/Argentina/Catamarca', 'America/Argentina/La_Rioja', 'America/Argentina/San_Juan', 'America/Argentina/Mendoza', 'America/Argentina/Rio_Gallegos', 'America/Argentina/Ushuaia'], 'code': 'AR', 'continent': 'South America', 'name': 'Argentina', 'capital': 'Buenos Aires'},
 {'timezones': ['Europe/Vienna'], 'code': 'AT', 'continent': 'Europe', 'name': 'Austria', 'capital': 'Vienna'},
 {'timezones': ['Australia/Lord_Howe', 'Australia/Hobart', 'Australia/Currie', 'Australia/Melbourne', 'Australia/Sydney', 'Australia/Broken_Hill', 'Australia/Brisbane', 'Australia/Lindeman', 'Australia/Adelaide', 'Australia/Darwin', 'Australia/Perth'], 
-'code': 'AU', 'continent': 'Oceania', 'name': 'Australia', 'capital': 'Canberra', 'news':['https://www.sbs.com.au/news/topic/world/feed','https://www.smh.com.au/rss/politics/federal.xml','https://www.abc.net.au/news/feed/2942460/rss.xml']},
+'code': 'AU', 'continent': 'Oceania', 'name': 'Australia', 'capital': 'Canberra', 'news':['https://www.foreignminister.gov.au/rss.xml']}, #'https://rssfeeds.aph.gov.au/senate/reports.xml','https://www.aph.gov.au/house/rss/media_releases']}, #'https://www.sbs.com.au/news/topic/world/feed','https://www.smh.com.au/rss/politics/federal.xml','https://www.abc.net.au/news/feed/2942460/rss.xml']},
 #'news':['https://www.foreignpolicy.com/feed/','https://www.fpri.org/feed','https://www.medium.com/feed/tag/foreign-policy','https://www.theconversation.com/au/topics/foreign-policy-266/articles.atom']}, #
 {'timezones': ['Asia/Baku'], 'code': 'AZ', 'continent': 'Asia', 'name': 'Azerbaijan', 'capital': 'Baku'},
 {'timezones': ['America/Barbados'], 'code': 'BB', 'continent': 'North America', 'name': 'Barbados', 'capital': 'Bridgetown'},
@@ -132,7 +132,7 @@ countries = [
 {'timezones': ['Indian/Mahe'], 'code': 'SC', 'continent': 'Africa', 'name': 'Seychelles', 'capital': 'Victoria'},
 {'timezones': ['Africa/Khartoum'], 'code': 'SD', 'continent': 'Africa', 'name': 'Sudan', 'capital': 'Khartoum'},
 {'timezones': ['Europe/Stockholm'], 'code': 'SE', 'continent': 'Europe', 'name': 'Sweden', 'capital': 'Stockholm'},
-{'timezones': ['Asia/Singapore'], 'code': 'SG', 'continent': 'Asia', 'name': 'Singapore', 'capital': 'Singapore','news':['straitstimes.com/news/singapore/rss.xml','https://www.straitstimes.com/news/world/rss.xml']},
+{'timezones': ['Asia/Singapore'], 'code': 'SG', 'continent': 'Asia', 'name': 'Singapore', 'capital': 'Singapore','news':['https://www.mfa.gov.sg/rss/press-statements-transcripts-and-photos']}, #'straitstimes.com/news/singapore/rss.xml','https://www.straitstimes.com/news/world/rss.xml']},
 {'timezones': ['Europe/Ljubljana'], 'code': 'SI', 'continent': 'Europe', 'name': 'Slovenia', 'capital': 'Ljubljana'},
 {'timezones': ['Europe/Bratislava'], 'code': 'SK', 'continent': 'Europe', 'name': 'Slovakia', 'capital': 'Bratislava'},
 {'timezones': ['Africa/Freetown'], 'code': 'SL', 'continent': 'Africa', 'name': 'Sierra Leone', 'capital': 'Freetown'},

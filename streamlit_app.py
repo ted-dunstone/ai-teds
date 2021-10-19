@@ -152,7 +152,7 @@ def main():
         news_urls = ['https://www.foreignpolicy.com/feed/','https://www.fpri.org/feed','https://www.medium.com/feed/tag/foreign-policy','https://www.theconversation.com/au/topics/foreign-policy-266/articles.atom','http://feeds.bbci.co.uk/news/world/rss.xml']
     for url in news_urls:
         articles = {**articles, **get_news_feed(url)}
-    res=st.sidebar.selectbox('articles',['None']+sorted(list(articles.keys())),on_change=clear_session)
+    res=st.selectbox('articles',['None']+sorted(list(articles.keys())),on_change=clear_session)
             
     conditioning_type=st.selectbox('type',list(conditioning.keys()),on_change=clear_session)
 
