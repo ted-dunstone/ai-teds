@@ -65,8 +65,12 @@ def update_cache_state():
         del st.session_state['result']
 
 def log_data(context,data=None):
-    with open("logs.txt","r") as fh:
-        logstxt = fh.read()
+    try:
+        with open("logs.txt","r") as fh:
+            logstxt = fh.read()
+    except:
+        logstxt=""
+        
     with open("logs.txt","w") as fh:
         fh.write('-----\n\n## %s\n\n'%datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S'))
         fh.write("```\n\n"+context+"\n\n```\n\n")
