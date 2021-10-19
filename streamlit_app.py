@@ -70,7 +70,7 @@ def log_data(context,data=None):
             logstxt = fh.read()
     except:
         logstxt=""
-        
+
     with open("logs.txt","w") as fh:
         fh.write('-----\n\n## %s\n\n'%datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S'))
         fh.write("```\n\n"+context+"\n\n```\n\n")
