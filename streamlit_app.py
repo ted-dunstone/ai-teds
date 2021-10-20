@@ -191,6 +191,13 @@ def main():
                     wrapper = textwrap.TextWrapper(width=80)
                     log_data(f'*{conditioning_type}*\n\n{inp}',wrapper.fill(result))
                     st.markdown(result)
+                elif conditioning_type=="office_holders":
+                    alg_input  = conditioning[conditioning_type] + '\n\n'+ inp + '\n\nAnswer:'
+                    result = generate_ai_response(alg_input,length,temp,st.session_state['update_cache_state'])
+                     # log the data
+                    result = result.split('===')[0]
+                    log_data(alg_input.split('===')[-1],result)
+                    st.markdown(result)                
                 else:
                     country_names = ' and '.join([country_dict[country]['name']+': ' for country in countries])
                     query_string = f"Question: {inp}. List the top five {conditioning_type} for {country_names}.\n\nAnswer:\n\n1."
