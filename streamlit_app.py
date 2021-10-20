@@ -136,7 +136,7 @@ def main():
         st.error("Invalid key: contact ted@biometix.com for a usage key.")
         return
 
-    temp = st.sidebar.selectbox('creativity',[0.5,0.8,1.0,1.1],2,format_func=lambda val : {0.5:'Low',0.8:'Medium',1.0:'Normal',1.1:'High'}[val],help="This will set how creative you would like the reponses.")
+    temp = st.sidebar.selectbox('creativity',[0.8,1.0,1.1],2,format_func=lambda val : {0.8:'Low',1.0:'Normal',1.1:'High'}[val],help="This will set how creative you would like the reponses.")
     
     st.info('This is a Beta Service. It has usage limitations which restrict its use to a maxium of 20 queries an hour (accross all users). Please test wisely.')
     #with st.sidebar.expander("Context..") as exp:
@@ -158,20 +158,15 @@ def main():
         articles = {**articles, **get_news_feed(url)}
     res=st.selectbox('articles',['None']+sorted(list(articles.keys())),on_change=clear_session)
             
-    conditioning_type=st.selectbox('type',list(conditioning.keys()),on_change=clear_session)
-
+    conditioning_type=st.selectbox('type',list(conditioning.keys())+['summary'],on_change=clear_session)
 
 
     response = None
     expand_topic = 'None'
     article_text = "" if not res or res == 'None' else articles[res]
     inp = st.text_area(
-                "Problem domain", article_text, max_chars=2000, height=150, on_change=clear_session
+                "Problem domain", article_text,  height=150, on_change=clear_session
             )
-    country_names = ' and '.join([country_dict[country]['name']+': ' for country in countries])
-
-    query_string = f"Question: {inp}. List the top five {conditioning_type} for {country_names}.\n\nAnswer:\n\n1."
-    alg_input  = conditioning[conditioning_type] + '\n\n'+ query_string
 
     warning = """The TEDS A.I. bot produced the following results. The results may be inaccurate, biased or otherwise incomplete. Please excerise appropriate caution before use."""
 
@@ -183,22 +178,38 @@ def main():
 
             if submit_button:
                 #st.write(inp)
-        
-                result="1. "+generate_ai_response(alg_input,length,temp,st.session_state['update_cache_state'])
+                if conditioning_type=="summary":
+                    if inp.startswith('http'):
+                        json_body = { "url": inp}
+                        resp = requests.post("https://api.smrzr.io/v1/summarize/news?num_sentences=5&min_length=40", json=json_body).json()
+                        result = resp['summary']
+                    else:
+                        resp = requests.post('https://api.smrzr.io/v1/summarize?num_sentences=5&algorithm=kmeans&min_length=40&max_length=500', data=inp.encode('utf-8') )
+                        result = resp.json()['summary']
 
-                # log the data
-                result = result.split('===')[0]
-                log_data(alg_input.split('===')[-1],result)
+                    import textwrap
+                    wrapper = textwrap.TextWrapper(width=80)
+                    log_data(f'*{conditioning_type}*\n\n{inp}',wrapper.fill(result))
+                    st.markdown(result)
+                else:
+                    country_names = ' and '.join([country_dict[country]['name']+': ' for country in countries])
+                    query_string = f"Question: {inp}. List the top five {conditioning_type} for {country_names}.\n\nAnswer:\n\n1."
+                    alg_input  = conditioning[conditioning_type] + '\n\n'+ query_string
+                    result="1. "+generate_ai_response(alg_input,length,temp,st.session_state['update_cache_state'])
+
+                    # log the data
+                    result = result.split('===')[0]
+                    log_data(alg_input.split('===')[-1],result)
                 
-                st.session_state.peice = []
-                for r in result.split('\n')[0:10]:
-                    if len(r)>0 and len(r.split('.'))>0:
-                        st.session_state.peice.append(r)
-                st.session_state.result = result
-                #st.session_state.inp = inp
-                st.info(warning)
-                st.markdown('\n'.join(result.split('\n')[0:10]))
-                done_query = True
+                    st.session_state.peice = []
+                    for r in result.split('\n')[0:10]:
+                        if len(r)>0 and len(r.split('.'))>0:
+                            st.session_state.peice.append(r)
+                    st.session_state.result = result
+                    #st.session_state.inp = inp
+                    st.info(warning)
+                    st.markdown('\n'.join(result.split('\n')[0:10]))
+                    done_query = True
 
     
 
