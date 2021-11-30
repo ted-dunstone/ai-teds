@@ -106,7 +106,7 @@ def main():
     st.set_page_config(  # Alternate names: setup_page, page, layout
         layout="wide",  # Can be "centered" or "wide". In the future also "dashboard", etc.
         initial_sidebar_state="expanded",  # Can be "auto", "expanded", "collapsed"
-        page_title="AI Diplomatic Analysis Tool (Adat)",  # String or None. Strings get appended with "• Streamlit".
+        page_title="AI Tool for Excamination of Diplomatic Scenarios",  # String or None. Strings get appended with "• Streamlit".
         page_icon=None,  # String, anything supported by st.image, or None.
     )
 
